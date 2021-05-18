@@ -20,3 +20,7 @@
 *.pch 
 *.res 
 *.user
+/ConsoleApp1/obj
+*.dll
+*.exe
+/ConsoleApp1/bin/Debug/net5.0
