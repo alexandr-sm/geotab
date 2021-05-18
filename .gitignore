@@ -1,0 +1,22 @@
+ *\obj
+ *\bin
+ *\Debug
+ *\Release
+
+*.dep 
+*.aps 
+*.vbw 
+*.suo 
+*.obj 
+*.ncb 
+*.plg 
+*.bsc 
+*.ilk 
+*.exp 
+*.sbr 
+*.opt 
+*.pdb 
+*.idb 
+*.pch 
+*.res 
+*.user
