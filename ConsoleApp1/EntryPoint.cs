@@ -33,13 +33,12 @@ namespace JokeGenerator
             //{
             while (true)
             {
-
                 _printer.Print("Press c to get categories");
                 _printer.Print("Press r to get random jokes");
                 GetEnteredKey(Console.ReadKey());
                 if (key == 'c')
                 {
-                    getCategories();
+                    //getCategories();
                     var categories = await _chuckNorrisService.GetCategoriesAsync();
                     _printer.Print(categories.Select(c => c.Name));
                     //PrintResults();
@@ -133,6 +132,9 @@ namespace JokeGenerator
                     break;
                 case ConsoleKey.Y:
                     key = 'y';
+                    break;
+                default:
+                    key = Char.MinValue;
                     break;
             }
         }
