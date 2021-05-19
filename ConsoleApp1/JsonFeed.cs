@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace ConsoleApp1
+namespace JokeGenerator
 {
     class JsonFeed
     {
@@ -58,12 +58,12 @@ namespace ConsoleApp1
 			return JsonConvert.DeserializeObject<dynamic>(result);
 		}
 
-		public static string[] GetCategories()
-		{
-			HttpClient client = new HttpClient();
-			client.BaseAddress = new Uri(_url);
+        public static string[] GetCategories()
+        {
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri(_url);
 
-			return new string[] { Task.FromResult(client.GetStringAsync("categories").Result).Result };
-		}
+            return new string[] { Task.FromResult(client.GetStringAsync("jokes/categories").Result).Result };
+        }
     }
 }
