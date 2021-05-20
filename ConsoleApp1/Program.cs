@@ -10,9 +10,9 @@ using Newtonsoft.Json;
 
 namespace JokeGenerator
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             var services = Startup.ConfigureServices();
             var serviceProvider = services.BuildServiceProvider();

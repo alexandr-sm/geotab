@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using JokeGenerator.Helpers;
 
 namespace JokeGenerator
 {
@@ -40,8 +41,8 @@ namespace JokeGenerator
 
                 while (true)
                 {
-                    _printer.Print("Press c to get categories");
-                    _printer.Print("Press r to get random jokes");
+                    _printer.Print(UIPrompts.ToGetCategoriesList);
+                    _printer.Print(UIPrompts.ToGetRandomJokes);
                     GetEnteredKey(Console.ReadKey());
                     if (key == 'c')
                     {
@@ -87,6 +88,7 @@ namespace JokeGenerator
             }
             //}
         }
+        
 
         //private static void PrintResults()
         //{

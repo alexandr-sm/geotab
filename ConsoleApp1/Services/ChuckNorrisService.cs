@@ -43,7 +43,7 @@ namespace JokeGenerator.Services
             }
             catch (Exception ex)
             {
-                throw new ChuckNorrisServiceException("Can't get categories at this moment.", ex);
+                throw new ChuckNorrisServiceException(ChuckNorrisServiceException.CATEGORY_GET_ERROR, ex);
             }
         }
 
@@ -57,7 +57,9 @@ namespace JokeGenerator.Services
 
         public async IAsyncEnumerable<string> GetRandomJokesAsync(int numberOfJokes = 1, string categoryOfJokes = null)
         {
-            Dictionary<string, string> category = String.IsNullOrEmpty(categoryOfJokes.Trim()) ? null : new() { { "category", categoryOfJokes.Trim() } };
+            Dictionary<string, string> category = 
+                String.IsNullOrEmpty(categoryOfJokes.Trim()) ? null 
+                : new() { { QueryStringParameters.JokeCategory, categoryOfJokes.Trim() } };
             foreach (int n in Enumerable.Range(1, numberOfJokes))
             {
                 yield return await GetRandomJokeAsync(category);
@@ -67,7 +69,10 @@ namespace JokeGenerator.Services
         public async IAsyncEnumerable<string> GetRandomJokesAsync((string first, string last)? names, int numberOfJokes = 1, string categoryOfJokes = null)
         {
             var newname = names.HasValue ? $"{names.Value.first.Trim()} {names.Value.last.Trim()}" : String.Empty;
-            Dictionary<string, string> category = String.IsNullOrEmpty(categoryOfJokes.Trim()) ? null : new() { { "category", categoryOfJokes.Trim() } };
+            Dictionary<string, string> category = 
+                String.IsNullOrEmpty(categoryOfJokes.Trim()) ? null 
+                : new() { { QueryStringParameters.JokeCategory, categoryOfJokes.Trim() } };
+
             foreach (int n in Enumerable.Range(1, numberOfJokes))
             {
                 var joke = await GetRandomJokeAsync(category);

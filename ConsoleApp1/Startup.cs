@@ -9,7 +9,7 @@ namespace JokeGenerator
         public static IServiceCollection ConfigureServices()
         {
             var services = new ServiceCollection();
-            
+
             services.AddLogging(l => l.AddConsole());
             services.AddTransient<EntryPoint>();
             services.AddHttpClient<IChuckNorrisService, ChuckNorrisService>();

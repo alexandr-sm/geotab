@@ -23,5 +23,7 @@ namespace JokeGenerator.Exceptions
             base(message, innerException)
         {
         }
+
+        public static string CATEGORY_GET_ERROR => "Can't get categories at this moment.";
     }
 }
