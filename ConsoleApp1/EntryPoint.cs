@@ -11,12 +11,9 @@ namespace JokeGenerator
 {
     public class EntryPoint
     {
-        static string[] results = new string[50];
-        static char key;
-        static (string first, string last)? names;
-        //static ConsolePrinter printer = new ConsolePrinter();
-        static string category;
-
+        
+        //static string[] results = new string[50];
+        
         private readonly IChuckNorrisService _chuckNorrisService;
         private readonly PersonService _personService;
         private readonly IPrinter _printer;
@@ -32,54 +29,39 @@ namespace JokeGenerator
 
         public async Task Run(String[] args)
         {
-            //_printer.Print("Press ? to get instructions.");
-            //if (Console.ReadLine() == "?")
-            //{
+            char key;
+            (string first, string last)? names;
+            string category;
+            IAsyncEnumerable<string> jokes;
             try
             {
-
-
                 while (true)
                 {
+                    names = null;
+                    category = null;
+                    jokes = null;
+
                     _printer.Print(UIPrompts.ToGetCategoriesList);
                     _printer.Print(UIPrompts.ToGetRandomJokes);
-                    GetEnteredKey(Console.ReadKey());
+                    key = GetEnteredKey(Console.ReadKey());
                     if (key == 'c')
                     {
-                        //getCategories();
                         var categories = await _chuckNorrisService.GetCategoriesAsync();
-                        _printer.Print(categories.Select(c => c.Name));
-                        //PrintResults();
+                        _printer.Print(categories);
                     }
                     if (key == 'r')
                     {
-                        _printer.Print("\nWant to use a random name? y/n");
-                        GetEnteredKey(Console.ReadKey());
-                        if (key == 'y')
-                        {
-                            names = await _personService.GetCanadaNamesAsync();
-                        }
-                        //GetNames();
-                        _printer.Print("\nWant to specify a category? y/n");
-                        GetEnteredKey(Console.ReadKey());
-                        if (key == 'y')
-                        {
-                            _printer.Print("\nEnter a category;");
-                            category = Console.ReadLine();
-                        }
-                        else
-                        {
-                            category = String.Empty;
-                        }
-                        _printer.Print("\nHow many jokes do you want? (1-9)");
-                        int n = Int32.Parse(Console.ReadLine());
-                        var jokes = _chuckNorrisService.GetRandomJokesAsync(names: names, numberOfJokes: n, categoryOfJokes: category);
+                        names = await GetRandomNames();
+
+                        category = await GetJokeCategory();
+
+                        jokes = GetJokes(names: names, categoryOfJokes: category);
+                        
                         await foreach (var joke in jokes)
                         {
                             _printer.Print(joke);
                         }
                     }
-                    names = null;
                 }
             }
             catch (Exception e)
@@ -88,15 +70,92 @@ namespace JokeGenerator
             }
             //}
         }
-        
+
+        private IAsyncEnumerable<string> GetJokes((string first, string last)? names, string categoryOfJokes = null)
+        {
+            _printer.Print(UIPrompts.ToGetJokesNumber);
+            string numberOfJokesStr = Console.ReadLine();
+            var validationResult = UserInputValidator.RangeValidate(numberOfJokesStr);
+            while (validationResult != ValidationOutcome.ValidationSuccess)
+            {
+                _printer.PrintLine(validationResult.Description);
+                _printer.Print(UIPrompts.ToGetJokesNumber);
+                numberOfJokesStr = Console.ReadLine();
+                validationResult = UserInputValidator.RangeValidate(numberOfJokesStr);
+            }
+
+            int.TryParse(numberOfJokesStr, out int numberOfJokes);
+            return _chuckNorrisService.GetRandomJokesAsync(names: names, numberOfJokes: numberOfJokes, categoryOfJokes: categoryOfJokes);
+        }
+
+        private async Task<string> GetJokeCategory()
+        {
+            _printer.PrintLine(UIPrompts.ToGetIfCategoryNeed);
+            var key = GetEnteredKey(Console.ReadKey());
+            var validationResult = UserInputValidator.YesNoValidate(key);
+            while (validationResult != ValidationOutcome.ValidationSuccess)
+            {
+                _printer.PrintLine(validationResult.Description);
+                _printer.Print(UIPrompts.ToGetIfCategoryNeed);
+                key = GetEnteredKey(Console.ReadKey());
+                validationResult = UserInputValidator.YesNoValidate(key);
+            }
+
+            if (key == 'n')
+            {
+                return String.Empty;
+            }
+
+            _printer.Print(UIPrompts.ToGetCategory);
+            var category = Console.ReadLine();
+            validationResult = UserInputValidator.JokeCategoryValidate(category);
+            while (validationResult != ValidationOutcome.ValidationSuccess)
+            {
+                _printer.Print(validationResult.Description);
+                _printer.Print(UIPrompts.AvailableCategories);
+                var categories = await _chuckNorrisService.GetCategoriesAsync();
+                _printer.Print(categories);
+                _printer.Print(UIPrompts.ToGetCategory);
+                category = Console.ReadLine();
+                validationResult = UserInputValidator.JokeCategoryValidate(category);
+            }
+
+            return category;
+
+        }
+
+        private async Task<(string fistname, string lastname)?> GetRandomNames()
+        {
+            _printer.PrintLine(UIPrompts.ToGetRandomName);
+            var key = GetEnteredKey(Console.ReadKey());
+            var validationResult = UserInputValidator.YesNoValidate(key);
+            while (validationResult != ValidationOutcome.ValidationSuccess)
+            {
+                _printer.PrintLine(validationResult.Description);
+                _printer.Print(UIPrompts.ToGetRandomName);
+                key = GetEnteredKey(Console.ReadKey());
+                validationResult = UserInputValidator.YesNoValidate(key);
+            }
+            if (key == 'y')
+            {
+                (string first, string last)? names = await _personService.GetCanadaNamesAsync();
+                if (names != null)
+                {
+                    _printer.PrintLine($"Generated name: {names.Value.first?.Trim()} {names.Value.last?.Trim()}");
+                    return names;
+                }
+            }
+            return null;
+        }
 
         //private static void PrintResults()
         //{
         //    _printer.Print("[" + string.Join(",", results) + "]");
         //}
 
-        private static void GetEnteredKey(ConsoleKeyInfo consoleKeyInfo)
+        private static char GetEnteredKey(ConsoleKeyInfo consoleKeyInfo)
         {
+            char key;
             switch (consoleKeyInfo.Key)
             {
                 case ConsoleKey.C:
@@ -139,28 +198,29 @@ namespace JokeGenerator
                     key = Char.MinValue;
                     break;
             }
+            return key;
         }
 
 
 
-        private static void GetRandomJokes(string category, int number)
-        {
-            new JsonFeed("https://api.chucknorris.io", number);
-            results = JsonFeed.GetRandomJokes(names?.Item1, names?.Item2, category);
-        }
+        //private static void GetRandomJokes(string category, int number)
+        //{
+        //    new JsonFeed("https://api.chucknorris.io", number);
+        //    results = JsonFeed.GetRandomJokes(names?.Item1, names?.Item2, category);
+        //}
 
-        private static void getCategories()
-        {
-            new JsonFeed("https://api.chucknorris.io", 0);
-            results = JsonFeed.GetCategories();
-        }
+        //private static void getCategories()
+        //{
+        //    new JsonFeed("https://api.chucknorris.io", 0);
+        //    results = JsonFeed.GetCategories();
+        //}
 
-        private static void GetNames()
-        {
-            new JsonFeed("https://www.names.privserv.com/api/", 0);
-            dynamic result = JsonFeed.Getnames();
-            names = Tuple.Create(result.name.ToString(), result.surname.ToString());
-        }
+        //private static void GetNames()
+        //{
+        //    new JsonFeed("https://www.names.privserv.com/api/", 0);
+        //    dynamic result = JsonFeed.Getnames();
+        //    names = Tuple.Create(result.name.ToString(), result.surname.ToString());
+        //}
 
     }
 }

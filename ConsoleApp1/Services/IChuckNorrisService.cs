@@ -9,7 +9,7 @@ namespace JokeGenerator.Services
     {
         HttpClient Client { get; }
 
-        Task<IEnumerable<Category>> GetCategoriesAsync();
+        Task<IEnumerable<string>> GetCategoriesAsync();
         Task<string> GetRandomJokeAsync(IDictionary<string, string> parameters = null);
         IAsyncEnumerable<string> GetRandomJokesAsync((string first, string last)? names, int numberOfJokes = 1, string categoryOfJokes = null);
         IAsyncEnumerable<string> GetRandomJokesAsync(int numberOfJokes = 1, string categoryOfJokes = null);

@@ -29,17 +29,21 @@ namespace JokeGenerator.Services
             _memoryCache = memoryCache;
         }
 
-        public async Task<IEnumerable<Category>> GetCategoriesAsync()
+        public ChuckNorrisService() : this (new HttpClient(), new MemoryCache(new MemoryCacheOptions()))
+        {
+        }
+
+        public async Task<IEnumerable<string>> GetCategoriesAsync()
         {
             try
             {
                 var categories = await _memoryCache.GetOrCreateAsync<IEnumerable<string>>(CacheKeys.JokeCategories, async entry =>
                 {
                     entry.SlidingExpiration = TimeSpan.FromHours(1);
-                    return await Client.GetFromJsonAsync<IEnumerable<String>>(CategoryUrl);
+                    return await Client.GetFromJsonAsync<IEnumerable<string>>(CategoryUrl);
                 });
                 
-                return categories.Select(c => new Category() { Name = c });
+                return categories;
             }
             catch (Exception ex)
             {

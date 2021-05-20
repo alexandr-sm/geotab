@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using JokeGenerator.Models;
 using JokeGenerator.Helpers;
+using JokeGenerator.Exceptions;
 
 namespace JokeGenerator.Services
 {
@@ -24,23 +25,31 @@ namespace JokeGenerator.Services
 
         public async Task<Person> GetRandomPersonAsync(IDictionary<string, string> parameters = null)
         {
-            string url = String.Empty.AddQueryString(parameters);
-            var person = await Client.GetFromJsonAsync<Person>(url);
-            return person;
+            try
+            {
+                string url = String.Empty.AddQueryString(parameters);
+                var person = await Client.GetFromJsonAsync<Person>(url);
+                return person;
+            }
+            catch (PersonServiceException ex)
+            {
+                throw new PersonServiceException(PersonServiceException.PERSON_GET_ERROR, ex);
+            }
+            
         }
 
         public async Task<(string firstname, string lastname)> GetNamesAsync(IDictionary<string, string> parameters = null)
         {
             var person = await GetRandomPersonAsync(parameters);
-            return (person.Name, person.Surname);
+            return (person?.Name, person?.Surname);
         }
 
-        public async Task<(string firstname, string lastname)> GetCanadaNamesAsync(IDictionary<string, string> parameters = null)
+        public async Task<(string firstname, string lastname)?> GetCanadaNamesAsync(IDictionary<string, string> parameters = null)
         {
             parameters = parameters ?? new Dictionary<string, string>();
             parameters.Add(DefaultRegionParam.Name, DefaultRegionParam.Value);
             var person = await GetRandomPersonAsync(parameters);
-            return (person.Name, person.Surname);
+            return person == null ? null : (person.Name, person.Surname);
         }
 
     }

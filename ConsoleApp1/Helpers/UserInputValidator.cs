@@ -1,35 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JokeGenerator.Services;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace JokeGenerator.Helpers
 {
-    public class ValidationOutcome
-    {
-        public int Code { get; set; }
-        public string Description { get; set; }
-    }
-
     public static class UserInputValidator
     {
-        public static ValidationOutcome ValidationSuccess => new() { Code = 0, Description = "Ok." };
-        public static ValidationOutcome ValidationInvalidInputGeneric => new() { Code = 1, Description = "Invalid input, try again." };
+        private const int JokesMinNumber = 1;
+        private const int JokesMaxNumber = 9;
 
         public static ValidationOutcome YesNoValidate(char inputValue)
         {
-            return new char[] { 'y', 'n' }.Contains(inputValue) ? ValidationSuccess : ValidationInvalidInputGeneric;
+            return new char[] { 'y', 'n' }.Contains(inputValue) ? ValidationOutcome.ValidationSuccess 
+                : ValidationOutcome.ValidationInvalidInputGeneric;
         }
 
         public static ValidationOutcome JokeCategoryValidate(string inputCategoryName)
         {
-            return new();
+            var _categoryList = new ChuckNorrisService().GetCategoriesAsync().Result;
+            return _categoryList.Contains(inputCategoryName) ? ValidationOutcome.ValidationSuccess 
+                : ValidationOutcome.ValidationInvalidInputGeneric;
         }
 
-        public static ValidationOutcome RangeValidate(int inputValue, int minValue, int maxValue)
+        public static ValidationOutcome RangeValidate(string inputValue)
         {
-            return new();
+            if (!int.TryParse(inputValue, out int jokeNumbers))
+            {
+                return ValidationOutcome.ValidationInvalidInputGeneric;
+            }
+
+            return jokeNumbers <= JokesMaxNumber && jokeNumbers >= JokesMinNumber ? ValidationOutcome.ValidationSuccess 
+                : ValidationOutcome.ValidationOutOfRange;
         }
     }
 }

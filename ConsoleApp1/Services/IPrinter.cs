@@ -6,5 +6,6 @@ namespace JokeGenerator.Services
     {
         void Print(IEnumerable<string> value);
         void Print(string value);
+        void PrintLine(string value);
     }
 }

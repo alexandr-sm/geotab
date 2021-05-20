@@ -10,7 +10,11 @@ namespace JokeGenerator
         {
             var services = new ServiceCollection();
 
-            services.AddLogging(l => l.AddConsole());
+            services.AddLogging(builder => builder
+                    .AddFilter("Microsoft", LogLevel.Error)
+                    .AddFilter("System", LogLevel.Error)
+                    .AddFilter("NToastNotify", LogLevel.Error)
+                    .AddConsole());
             services.AddTransient<EntryPoint>();
             services.AddHttpClient<IChuckNorrisService, ChuckNorrisService>();
             services.AddHttpClient<PersonService>();
