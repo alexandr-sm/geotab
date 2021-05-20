@@ -1,10 +1,6 @@
 ﻿using JokeGenerator.Services;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace JokeGenerator
 {
@@ -13,11 +9,14 @@ namespace JokeGenerator
         public static IServiceCollection ConfigureServices()
         {
             var services = new ServiceCollection();
-
+            
+            services.AddLogging(l => l.AddConsole());
             services.AddTransient<EntryPoint>();
-            services.AddHttpClient<ChuckNorrisService>();
+            services.AddHttpClient<IChuckNorrisService, ChuckNorrisService>();
             services.AddHttpClient<PersonService>();
             services.AddSingleton<IPrinter, ConsolePrinter>();
+            services.AddMemoryCache();
+            
 
             return services;
         }

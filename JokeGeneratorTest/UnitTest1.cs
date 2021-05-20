@@ -1,14 +1,17 @@
 using NUnit.Framework;
 using System;
 using System.IO;
+using JokeGenerator
 
 namespace JokeGeneratorTest
 {
     public class Tests
     {
+        
         [SetUp]
         public void Setup()
         {
+            
         }
 
         [Test]

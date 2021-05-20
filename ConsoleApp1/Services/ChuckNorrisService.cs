@@ -7,28 +7,49 @@ using System.Text;
 using System.Threading.Tasks;
 using JokeGenerator.Models;
 using JokeGenerator.Helpers;
+using JokeGenerator.Exceptions;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace JokeGenerator.Services
 {
-    public class ChuckNorrisService
+
+
+    public class ChuckNorrisService : IChuckNorrisService
     {
         public HttpClient Client { get; }
+        private readonly IMemoryCache _memoryCache;
+        const string BaseUrl = "https://api.chucknorris.io";
+        const string CategoryUrl = "jokes/categories";
+        const string RandomJokeUrl = "jokes/random";
 
-        public ChuckNorrisService(HttpClient client)
+        public ChuckNorrisService(HttpClient client, IMemoryCache memoryCache)
         {
-            client.BaseAddress = new Uri("https://api.chucknorris.io");
+            client.BaseAddress = new Uri(BaseUrl);
             Client = client;
+            _memoryCache = memoryCache;
         }
 
         public async Task<IEnumerable<Category>> GetCategoriesAsync()
         {
-            var categories = await Client.GetFromJsonAsync<IEnumerable<String>>("jokes/categories");
-            return categories.Select(c => new Category() { Name = c });
+            try
+            {
+                var categories = await _memoryCache.GetOrCreateAsync<IEnumerable<string>>(CacheKeys.JokeCategories, async entry =>
+                {
+                    entry.SlidingExpiration = TimeSpan.FromHours(1);
+                    return await Client.GetFromJsonAsync<IEnumerable<String>>(CategoryUrl);
+                });
+                
+                return categories.Select(c => new Category() { Name = c });
+            }
+            catch (Exception ex)
+            {
+                throw new ChuckNorrisServiceException("Can't get categories at this moment.", ex);
+            }
         }
 
         public async Task<String> GetRandomJokeAsync(IDictionary<string, string> parameters = null)
         {
-            string url = "jokes/random".AddQueryString(parameters);
+            string url = RandomJokeUrl.AddQueryString(parameters);
             var joke = await Client.GetFromJsonAsync<Joke>(url);
             return joke.Value;
         }
@@ -36,7 +57,7 @@ namespace JokeGenerator.Services
 
         public async IAsyncEnumerable<string> GetRandomJokesAsync(int numberOfJokes = 1, string categoryOfJokes = null)
         {
-            Dictionary<string, string> category = String.IsNullOrEmpty(categoryOfJokes.Trim()) ? null : new () { { "category", categoryOfJokes.Trim() } };
+            Dictionary<string, string> category = String.IsNullOrEmpty(categoryOfJokes.Trim()) ? null : new() { { "category", categoryOfJokes.Trim() } };
             foreach (int n in Enumerable.Range(1, numberOfJokes))
             {
                 yield return await GetRandomJokeAsync(category);

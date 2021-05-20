@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace JokeGenerator
 {
@@ -15,15 +16,17 @@ namespace JokeGenerator
         //static ConsolePrinter printer = new ConsolePrinter();
         static string category;
 
-        private readonly ChuckNorrisService _chuckNorrisService;
+        private readonly IChuckNorrisService _chuckNorrisService;
         private readonly PersonService _personService;
         private readonly IPrinter _printer;
+        private readonly ILogger<EntryPoint> _logger;
 
-        public EntryPoint(ChuckNorrisService chuckNorrisService, PersonService personService, IPrinter printer)
+        public EntryPoint(IChuckNorrisService chuckNorrisService, PersonService personService, IPrinter printer, ILogger<EntryPoint> logger)
         {
             _chuckNorrisService = chuckNorrisService;
             _printer = printer;
             _personService = personService;
+            _logger = logger;
         }
 
         public async Task Run(String[] args)
@@ -31,59 +34,56 @@ namespace JokeGenerator
             //_printer.Print("Press ? to get instructions.");
             //if (Console.ReadLine() == "?")
             //{
-            while (true)
+            try
             {
-                _printer.Print("Press c to get categories");
-                _printer.Print("Press r to get random jokes");
-                GetEnteredKey(Console.ReadKey());
-                if (key == 'c')
+
+
+                while (true)
                 {
-                    //getCategories();
-                    var categories = await _chuckNorrisService.GetCategoriesAsync();
-                    _printer.Print(categories.Select(c => c.Name));
-                    //PrintResults();
-                }
-                if (key == 'r')
-                {
-                    _printer.Print("\nWant to use a random name? y/n");
+                    _printer.Print("Press c to get categories");
+                    _printer.Print("Press r to get random jokes");
                     GetEnteredKey(Console.ReadKey());
-                    if (key == 'y')
+                    if (key == 'c')
                     {
-                        names = await _personService.GetCanadaNamesAsync();
+                        //getCategories();
+                        var categories = await _chuckNorrisService.GetCategoriesAsync();
+                        _printer.Print(categories.Select(c => c.Name));
+                        //PrintResults();
                     }
+                    if (key == 'r')
+                    {
+                        _printer.Print("\nWant to use a random name? y/n");
+                        GetEnteredKey(Console.ReadKey());
+                        if (key == 'y')
+                        {
+                            names = await _personService.GetCanadaNamesAsync();
+                        }
                         //GetNames();
-                    _printer.Print("\nWant to specify a category? y/n");
-                    GetEnteredKey(Console.ReadKey());
-                    if (key == 'y')
-                    {
-                        //_printer.Print("\nHow many jokes do you want? (1-9)");
-                        //int n = Int32.Parse(Console.ReadLine());
-                        _printer.Print("\nEnter a category;");
-                        category = Console.ReadLine();
-                        //var joke = _chuckNorrisService.GetRandomJokesAsync();
-                        //GetRandomJokes(Console.ReadLine(), n);
-                        //_printer.Print(results);
-                        ////PrintResults();
+                        _printer.Print("\nWant to specify a category? y/n");
+                        GetEnteredKey(Console.ReadKey());
+                        if (key == 'y')
+                        {
+                            _printer.Print("\nEnter a category;");
+                            category = Console.ReadLine();
+                        }
+                        else
+                        {
+                            category = String.Empty;
+                        }
+                        _printer.Print("\nHow many jokes do you want? (1-9)");
+                        int n = Int32.Parse(Console.ReadLine());
+                        var jokes = _chuckNorrisService.GetRandomJokesAsync(names: names, numberOfJokes: n, categoryOfJokes: category);
+                        await foreach (var joke in jokes)
+                        {
+                            _printer.Print(joke);
+                        }
                     }
-                    else
-                    {
-                        category = String.Empty;
-                        //_printer.Print("\nHow many jokes do you want? (1-9)");
-                        //int n = Int32.Parse(Console.ReadLine());
-                        //var joke = _chuckNorrisService.GetRandomJokesAsync();
-                        //GetRandomJokes(null, n);
-                        //_printer.Print(results);
-                        ////PrintResults();
-                    }
-                    _printer.Print("\nHow many jokes do you want? (1-9)");
-                    int n = Int32.Parse(Console.ReadLine());
-                    var jokes = _chuckNorrisService.GetRandomJokesAsync(names: names, numberOfJokes: n, categoryOfJokes: category);
-                    await foreach (var joke in jokes)
-                    {
-                        _printer.Print(joke);
-                    }
+                    names = null;
                 }
-                names = null;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
             }
             //}
         }

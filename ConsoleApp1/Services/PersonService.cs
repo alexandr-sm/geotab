@@ -12,17 +12,19 @@ namespace JokeGenerator.Services
 {
     public class PersonService
     {
+        const string BaseUrl = "https://www.names.privserv.com/api/";
+        readonly (string Name, string Value) DefaultRegionParam = ("region", "Canada");
         public HttpClient Client { get; }
-
+        
         public PersonService(HttpClient client)
         {
-            client.BaseAddress = new Uri("https://www.names.privserv.com/api/");
+            client.BaseAddress = new Uri(BaseUrl);
             Client = client;
         }
 
         public async Task<Person> GetRandomPersonAsync(IDictionary<string, string> parameters = null)
         {
-            string url = "".AddQueryString(parameters);
+            string url = String.Empty.AddQueryString(parameters);
             var person = await Client.GetFromJsonAsync<Person>(url);
             return person;
         }
@@ -36,7 +38,7 @@ namespace JokeGenerator.Services
         public async Task<(string firstname, string lastname)> GetCanadaNamesAsync(IDictionary<string, string> parameters = null)
         {
             parameters = parameters ?? new Dictionary<string, string>();
-            parameters.Add("region", "Canada");
+            parameters.Add(DefaultRegionParam.Name, DefaultRegionParam.Value);
             var person = await GetRandomPersonAsync(parameters);
             return (person.Name, person.Surname);
         }
