@@ -25,3 +25,4 @@
 *.exe
 /ConsoleApp1/bin/Debug/net5.0
 /JokeGeneratorTest/bin/Debug/net5.0
+/.vs/JokeGenerator/v16/TestStore/0
