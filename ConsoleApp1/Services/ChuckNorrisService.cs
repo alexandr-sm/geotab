@@ -81,7 +81,7 @@ namespace JokeGenerator.Services
         {
             var newname = names.HasValue ? $"{names.Value.first.Trim()} {names.Value.last.Trim()}" : String.Empty;
             Dictionary<string, string> category = 
-                String.IsNullOrEmpty(categoryOfJokes.Trim()) ? null 
+                String.IsNullOrEmpty(categoryOfJokes) ? null 
                 : new() { { QueryStringParameters.JokeCategory, categoryOfJokes.Trim() } };
 
             foreach (int n in Enumerable.Range(1, numberOfJokes))

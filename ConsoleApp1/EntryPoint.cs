@@ -15,11 +15,11 @@ namespace JokeGenerator
         //static string[] results = new string[50];
         
         private readonly IChuckNorrisService _chuckNorrisService;
-        private readonly PersonService _personService;
+        private readonly IPersonService _personService;
         private readonly IPrinter _printer;
         private readonly ILogger<EntryPoint> _logger;
 
-        public EntryPoint(IChuckNorrisService chuckNorrisService, PersonService personService, IPrinter printer, ILogger<EntryPoint> logger)
+        public EntryPoint(IChuckNorrisService chuckNorrisService, IPersonService personService, IPrinter printer, ILogger<EntryPoint> logger)
         {
             _chuckNorrisService = chuckNorrisService;
             _printer = printer;
@@ -106,7 +106,7 @@ namespace JokeGenerator
                 return String.Empty;
             }
 
-            _printer.Print(UIPrompts.ToGetCategory);
+            _printer.PrintLine(UIPrompts.ToGetCategory);
             var category = Console.ReadLine();
             validationResult = UserInputValidator.JokeCategoryValidate(category);
             while (validationResult != ValidationOutcome.ValidationSuccess)

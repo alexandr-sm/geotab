@@ -17,7 +17,7 @@ namespace JokeGenerator
                     .AddConsole());
             services.AddTransient<EntryPoint>();
             services.AddHttpClient<IChuckNorrisService, ChuckNorrisService>();
-            services.AddHttpClient<PersonService>();
+            services.AddHttpClient<IPersonService, PersonService>();
             services.AddSingleton<IPrinter, ConsolePrinter>();
             services.AddMemoryCache();
             

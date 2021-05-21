@@ -11,12 +11,12 @@ using JokeGenerator.Exceptions;
 
 namespace JokeGenerator.Services
 {
-    public class PersonService
+    public class PersonService : IPersonService
     {
         const string BaseUrl = "https://www.names.privserv.com/api/";
         readonly (string Name, string Value) DefaultRegionParam = ("region", "Canada");
         public HttpClient Client { get; }
-        
+
         public PersonService(HttpClient client)
         {
             client.BaseAddress = new Uri(BaseUrl);
@@ -35,7 +35,7 @@ namespace JokeGenerator.Services
             {
                 throw new PersonServiceException(PersonServiceException.PERSON_GET_ERROR, ex);
             }
-            
+
         }
 
         public async Task<(string firstname, string lastname)> GetNamesAsync(IDictionary<string, string> parameters = null)

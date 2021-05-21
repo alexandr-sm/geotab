@@ -1,10 +1,6 @@
 using NUnit.Framework;
 using JokeGenerator.Services;
-using JokeGenerator.Models;
 using System.Linq;
-using System;
-using System.IO;
-//using System.Runtime.Caching;
 using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Generic;
 using JokeGenerator.Exceptions;
@@ -22,7 +18,7 @@ namespace JokeGeneratorTest
         }
 
         [Test]
-        public void GetNamesAsyncTest()
+        public void GetCategoriesAsyncTest()
         {
             var categories = _chuckNorrisService.GetCategoriesAsync().Result;
             categories.ToList().ForEach(c => Assert.Greater(c.Length, 0));
@@ -43,5 +39,32 @@ namespace JokeGeneratorTest
             var ex = Assert.ThrowsAsync<ChuckNorrisServiceException>(async () => { await _chuckNorrisService.GetRandomJokeAsync(parameters); });
             Assert.That(ex.Message, Is.EqualTo(ChuckNorrisServiceException.JOKES_GET_ERROR));
         }
+
+        [TestCaseSource(nameof(GetNameAndJokesNumber))]
+        public void GetRandomJokesAsyncTestAsync((string firstname, string lastname, int numberOfJokes) v)
+        {
+            var randomJokes = _chuckNorrisService.GetRandomJokesAsync(names: (v.firstname, v.lastname), numberOfJokes: v.numberOfJokes, categoryOfJokes: null).ToListAsync().Result;
+
+            foreach (var joke in randomJokes)
+            {
+                Assert.That(joke, Contains.Substring($"{v.firstname} {v.lastname}"));
+            }
+
+            Assert.AreEqual(v.numberOfJokes, randomJokes.Count);
+        }
+
+        #region TestCaseSources
+        static IEnumerable<(string firstname, string lastname, int numberOfJokes)> GetNameAndJokesNumber()
+        {
+            return new (string firstname, string lastname, int numberOfJokes)[]
+            {
+                ("aaa", "bbb", 9),
+                ("aaa", "bbb", 5)
+            };
+
+        }
+
+        #endregion
+
     }
 }
