@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text;
 using System.Threading.Tasks;
 using JokeGenerator.Models;
 using JokeGenerator.Helpers;
@@ -17,12 +15,21 @@ namespace JokeGenerator.Services
         readonly (string Name, string Value) DefaultRegionParam = ("region", "Canada");
         public HttpClient Client { get; }
 
+        /// <summary>
+        /// Setup HttpClient and Web API base url
+        /// </summary>
+        /// <param name="client"></param>
         public PersonService(HttpClient client)
         {
             client.BaseAddress = new Uri(BaseUrl);
             Client = client;
         }
 
+        /// <summary>
+        /// Get random generated Person data from Web API
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
         public async Task<Person> GetRandomPersonAsync(IDictionary<string, string> parameters = null)
         {
             try
@@ -38,12 +45,22 @@ namespace JokeGenerator.Services
 
         }
 
+        /// <summary>
+        /// Get person's first and last name by extracting them from random generated Person data
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
         public async Task<(string firstname, string lastname)> GetNamesAsync(IDictionary<string, string> parameters = null)
         {
             var person = await GetRandomPersonAsync(parameters);
             return (person?.Name, person?.Surname);
         }
 
+        /// <summary>
+        /// Get person's first and last name by extracting them from random generated Person data for Canada region
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
         public async Task<(string firstname, string lastname)?> GetCanadaNamesAsync(IDictionary<string, string> parameters = null)
         {
             parameters = parameters ?? new Dictionary<string, string>();

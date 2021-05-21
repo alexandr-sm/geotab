@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text;
 using System.Threading.Tasks;
 using JokeGenerator.Models;
 using JokeGenerator.Helpers;
@@ -22,6 +21,11 @@ namespace JokeGenerator.Services
         const string CategoryUrl = "jokes/categories";
         const string RandomJokeUrl = "jokes/random";
 
+        /// <summary>
+        /// Setup HttpClient and Memory Cache and Web API base url
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="memoryCache"></param>
         public ChuckNorrisService(HttpClient client, IMemoryCache memoryCache)
         {
             client.BaseAddress = new Uri(BaseUrl);
@@ -33,6 +37,10 @@ namespace JokeGenerator.Services
         {
         }
 
+        /// <summary>
+        /// Get joke categories from Web API call
+        /// </summary>
+        /// <returns></returns>
         public async Task<IEnumerable<string>> GetCategoriesAsync()
         {
             try
@@ -51,6 +59,11 @@ namespace JokeGenerator.Services
             }
         }
 
+        /// <summary>
+        /// Get random joke from Web API call
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
         public async Task<String> GetRandomJokeAsync(IDictionary<string, string> parameters = null)
         {
             try
@@ -65,7 +78,12 @@ namespace JokeGenerator.Services
             }
         }
 
-
+        /// <summary>
+        /// Get specified number of jokes in specified category
+        /// </summary>
+        /// <param name="numberOfJokes"></param>
+        /// <param name="categoryOfJokes"></param>
+        /// <returns></returns>
         public async IAsyncEnumerable<string> GetRandomJokesAsync(int numberOfJokes = 1, string categoryOfJokes = null)
         {
             Dictionary<string, string> category = 
@@ -77,6 +95,13 @@ namespace JokeGenerator.Services
             }
         }
 
+        /// <summary>
+        /// Get specified number of jokes in specified category and subsitute 'Chuck Norris' with provided name
+        /// </summary>
+        /// <param name="names"></param>
+        /// <param name="numberOfJokes"></param>
+        /// <param name="categoryOfJokes"></param>
+        /// <returns></returns>
         public async IAsyncEnumerable<string> GetRandomJokesAsync((string first, string last)? names, int numberOfJokes = 1, string categoryOfJokes = null)
         {
             var newname = names.HasValue ? $"{names.Value.first.Trim()} {names.Value.last.Trim()}" : String.Empty;

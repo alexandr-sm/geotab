@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Collections.Specialized;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JokeGenerator.Helpers
 {
     public static class QueryStringBuilder
     {
+        /// <summary>
+        /// Build connection string (?key1=value1&key2=value2)
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="parameters">Dictionary with key value pairs</param>
+        /// <returns>url + builded connection string</returns>
         public static string AddQueryString(this string url, IDictionary<string, string> parameters)
         {
             if (parameters == null)

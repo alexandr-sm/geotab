@@ -12,8 +12,6 @@ namespace JokeGenerator
     public class EntryPoint
     {
         
-        //static string[] results = new string[50];
-        
         private readonly IChuckNorrisService _chuckNorrisService;
         private readonly IPersonService _personService;
         private readonly IPrinter _printer;
@@ -148,11 +146,6 @@ namespace JokeGenerator
             return null;
         }
 
-        //private static void PrintResults()
-        //{
-        //    _printer.Print("[" + string.Join(",", results) + "]");
-        //}
-
         private static char GetEnteredKey(ConsoleKeyInfo consoleKeyInfo)
         {
             char key;
@@ -200,27 +193,5 @@ namespace JokeGenerator
             }
             return key;
         }
-
-
-
-        //private static void GetRandomJokes(string category, int number)
-        //{
-        //    new JsonFeed("https://api.chucknorris.io", number);
-        //    results = JsonFeed.GetRandomJokes(names?.Item1, names?.Item2, category);
-        //}
-
-        //private static void getCategories()
-        //{
-        //    new JsonFeed("https://api.chucknorris.io", 0);
-        //    results = JsonFeed.GetCategories();
-        //}
-
-        //private static void GetNames()
-        //{
-        //    new JsonFeed("https://www.names.privserv.com/api/", 0);
-        //    dynamic result = JsonFeed.Getnames();
-        //    names = Tuple.Create(result.name.ToString(), result.surname.ToString());
-        //}
-
     }
 }

@@ -1,10 +1,6 @@
 using NUnit.Framework;
 using JokeGenerator.Services;
 using JokeGenerator.Models;
-using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace JokeGeneratorTest
 {
