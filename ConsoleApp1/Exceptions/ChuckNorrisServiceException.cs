@@ -21,5 +21,6 @@ namespace JokeGenerator.Exceptions
         }
 
         public static string CATEGORY_GET_ERROR => "Can't get categories at this moment.";
+        public static string JOKES_GET_ERROR => "Can't get jokes at this moment.";
     }
 }

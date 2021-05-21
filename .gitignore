@@ -24,3 +24,4 @@
 *.dll
 *.exe
 /ConsoleApp1/bin/Debug/net5.0
+/JokeGeneratorTest/bin/Debug/net5.0

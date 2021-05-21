@@ -53,9 +53,16 @@ namespace JokeGenerator.Services
 
         public async Task<String> GetRandomJokeAsync(IDictionary<string, string> parameters = null)
         {
-            string url = RandomJokeUrl.AddQueryString(parameters);
-            var joke = await Client.GetFromJsonAsync<Joke>(url);
-            return joke.Value;
+            try
+            {
+                string url = RandomJokeUrl.AddQueryString(parameters);
+                var joke = await Client.GetFromJsonAsync<Joke>(url);
+                return joke.Value;
+            }
+            catch (Exception ex)
+            {
+                throw new ChuckNorrisServiceException(ChuckNorrisServiceException.JOKES_GET_ERROR, ex);
+            }
         }
 
 
@@ -84,38 +91,5 @@ namespace JokeGenerator.Services
                 yield return joke;
             }
         }
-
-        //public async IAsyncEnumerable<string> GetRandomJokeAsync(string firstname, string lastname, int numberOfJokes,  string categoryOfJokes)
-        //{
-        //    return Task.WhenAll(from n in Enumerable.Range(1, numberOfJokes) select GetRandomJokeAsync());
-        //}
-
-        //public static string[] GetRandomJokes(string firstname, string lastname, string category)
-        //{
-        //    HttpClient client = new HttpClient();
-        //    client.BaseAddress = new Uri(_url);
-        //    string url = "jokes/random";
-        //    if (category != null)
-        //    {
-        //        if (url.Contains('?'))
-        //            url += "&";
-        //        else url += "?";
-        //        url += "category=";
-        //        url += category;
-        //    }
-
-        //    string joke = Task.FromResult(client.GetStringAsync(url).Result).Result;
-
-        //    if (firstname != null && lastname != null)
-        //    {
-        //        int index = joke.IndexOf("Chuck Norris");
-        //        string firstPart = joke.Substring(0, index);
-        //        string secondPart = joke.Substring(0 + index + "Chuck Norris".Length, joke.Length - (index + "Chuck Norris".Length));
-        //        joke = firstPart + " " + firstname + " " + lastname + secondPart;
-        //    }
-
-        //    return new string[] { JsonConvert.DeserializeObject<dynamic>(joke).value };
-        //}
-
     }
 }
