@@ -187,6 +187,9 @@ namespace JokeGenerator
                 case ConsoleKey.Y:
                     key = 'y';
                     break;
+                case ConsoleKey.N:
+                    key = 'n';
+                    break;
                 default:
                     key = Char.MinValue;
                     break;
